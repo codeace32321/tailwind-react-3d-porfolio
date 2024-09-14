@@ -3,9 +3,8 @@ import {Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 const App = () => {
   return (
     <main>
-
-      navbar
       <Router>
+        Navbar
         <Routes>
           <Route path='/home' element={'Home'}/>
           <Route path='/about' element={'About'}/>
