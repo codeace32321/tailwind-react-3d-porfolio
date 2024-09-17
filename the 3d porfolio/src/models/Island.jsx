@@ -6,7 +6,7 @@ Source: https://sketchfab.com/3d-models/foxs-islands-163b68e09fcc47618450150be77
 Title: Fox's islands
 */
 
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
 import {useFrame, useThree} from '@react-three/fiber'
 
@@ -14,9 +14,94 @@ import islandScene from '../assets/3d/island.glb'
 import { a } from '@react-spring/three'
 
 
-const Island = (props) => {
+const Island = ({ isRotating, setIsRotating, ...props}) => {
   const islandRef = useRef();
+  const {gl, viewport} = useThree();
   const { nodes, materials } = useGLTF(islandScene);
+
+
+  const lastX = useRef(0);
+  const rotationSpeed = useRef(0);
+  const dampingFactor = 0.95;
+
+  const handlePointerDown = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsRotating(true);
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    lastX.current = clientX;
+  }
+
+  const handlePointerUp = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsRotating(true);
+
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    lastX.current = clientX;
+
+    const delta = (clientX - lastX.current) / viewport.width;
+
+    islandRef.current.ratation.y += delta * 0.01 * Math.PI;
+    lastX.current = clientX;
+    rotationSpeed.current = delta * 0.01 * MathPI;
+  }
+
+  const handlePointerMove = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    
+
+    if(isRotating) handlePointerUp(e);
+  }
+
+
+  const handleKeyDown = (e) => {
+    if(e.key === 'arrowLeft'){
+    if(!isRotating) setIsRotating(true);
+    islandRef.current.rotation.y += 0.01 * Math.PI;
+
+  } else if (e. key === 'arrowRight') {
+    if(!isRotating) setIsRotating(true);
+    islandRef.current.rotation.y -= 0.01 * Math.PI;
+  }
+} 
+
+
+  useEffect (() => {
+    document.addEventListener('pointerdown', 
+      handlePointerDown
+    );
+
+    document.addEventListener('pointerup', 
+      handlePointerUp
+    );
+
+    document.addEventListener('pointermove', 
+      handlePointerMove
+    );
+
+    return () => {
+
+      document.removeEventListener('pointerdown', 
+        handlePointerDown
+      );
+  
+      document.removeEventListener('pointerup', 
+        handlePointerUp
+      );
+  
+      document.removeEventListener('pointermove', 
+        handlePointerMove
+      );
+  
+
+    }
+
+  }, [ handlePointerDown, handlePointerUp, handlePointerMove]);
+
   return (
     <a.group ref={islandRef} {...props}>
       <mesh
